@@ -13,7 +13,7 @@ function AddTask(props) {
 
     function addNewTask(columnId, content) {
         
-        const newTaskId = 'task' + (Math.random() * 1000000);
+        const newTaskId = 'task' + Math.floor(Math.random() * 1000000);
 
         const column = props.board.columns[columnId];
         const newTaskIds = Array.from(column.taskIds);
