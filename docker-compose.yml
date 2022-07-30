@@ -1,11 +1,10 @@
-version: '3.8'
-
+version: '3.10'
 services:
   db:
     image: postgres
     restart: always
     volumes: 
-      - pgdata:/var/lib/postgresql/data
+      - postgresdata:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: Password1
     ports: 
@@ -18,4 +17,4 @@ services:
       - 8080:8080
 
 volumes:
-  pgdata:
+  postgresdata:
