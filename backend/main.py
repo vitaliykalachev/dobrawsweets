@@ -1,10 +1,17 @@
 
 from fastapi import FastAPI
+import jwt
+from passlib.hash import bcrypt
+
 from pydantic import BaseModel
 from tortoise import fields
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.pydantic import pydantic_model_creator
 from tortoise.models import Model
+
+JWT_SECRET = "myjwsecret"
+
+
 
 
 app = FastAPI()
@@ -35,8 +42,19 @@ class User(Model):
     password = fields.CharField(200)
     board = fields.JSONField(default='{"tasks": {}, "columns": {}, "columnOrder": []}')
     
+    def vrify_password(self, password):
+        return bcrypt.verify(password, self.password)
+    
 User_Pydantic = pydantic_model_creator(User, name='User')
 UserIn_Pydantic = pydantic_model_creator(User, name="UserIn", exclude_readonly=True)
+
+async def authenticate_user(username: str, password: str):
+    user = await User.get(username=username)
+    if not user:
+        return False
+    if not user.verify_password(password):
+        return False
+    return user
 
 
 @app.get('/board')
@@ -50,6 +68,14 @@ async def save_board(board: Board):
     user.board = board.json()
     await user.save()
     return{"status": "success"}
+
+@app.post('/users')
+async def create_user(user_in: UserIn_Pydantic):
+    user = User(username=user_in.username, password=bcrypt.hash(user_in.password))
+    await user.save()
+    user_obj = await User_Pydantic.from_tortoise_orm(user)
+    token = jwt.encode(user_obj.dict(), JWT_SECRET)
+    return{'access_token': token}
 
 
 register_tortoise(
