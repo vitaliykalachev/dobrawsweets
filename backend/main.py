@@ -72,7 +72,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return await User_Pydantic.from_tortoise_orm(user)
 
 @app.get('/board')
-async def get_board(user: User_Pydantic = Depends(get_current_user)):
+async def get_board(): #user: User_Pydantic = Depends(get_current_user)
     user = await User.get(id=1)
     return {'board': user.board}
 
