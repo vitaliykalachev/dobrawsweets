@@ -1,27 +1,17 @@
-import React, {useState} from "react";
+import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 
-
 function Register(props) {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [username, setUsername] = useState();
+    const [password, setPassword] = useState();
     const history = useHistory();
-    
-    function handleSubmit(e) {
-        e.preventDefault();
-
-        createUser.then(data => {
-            props.setToken(data.access_token);
-            localStorage.setItem('token', JSON.stringify(data.access_token));
-            history.push('/');
-        })
-    }
 
     async function createUser() {
         const formData = {
             username: username,
-            password: password
-        };
+            password_hash: password,
+        }
+
         const response = await fetch('/users', {
             method: "POST",
             headers: {
@@ -34,18 +24,24 @@ function Register(props) {
         return data;
     }
 
-    return(
-        <form onSubmit={handleSubmit}>
-            <p>
+    function handleSubmit(e) {
+        e.preventDefault();
+        
+        createUser().then(data => {
+            props.setToken(data.access_token);
+            localStorage.setItem('token', JSON.stringify(data.access_token));
+            history.push("/");
+        });
+    }
+
+    return (
+        <div>
+            <form onSubmit={handleSubmit}>
                 Username <input type="text" onChange={e => setUsername(e.target.value)} />
-            </p>
-            <p>
-                Password <input type="password" onChange={e => setPassword(e.target.value)} />
-            </p>
-            <p>
+                Password <input type="password" onChange={e => setPassword(e.target.value)} /> 
                 <button>Register</button>
-            </p>
-        </form>
+            </form>
+        </div>
     )
 }
 

@@ -1,15 +1,16 @@
-version: '3.10'
+version: '3.8'
+
 services:
   db:
-    image: postgres
+    image: postgres:14
     restart: always
     volumes: 
       - postgresdata:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: Password1
-    ports: 
+    ports:
       - 5432:5432
-      
+
   adminer:
     image: adminer
     restart: always
